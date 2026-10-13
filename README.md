@@ -32,6 +32,50 @@ Si alguna vez la flash externa se borra o se reescribe (por ejemplo con una actu
 programa lo detecta y vuelve a copiar `outrun.dat`. Si aun así algo falla, basta con borrar
 `outrun.dat` y se regenera desde las ROMs.
 
+## ROMs necesarias
+
+Son los 31 ficheros de OutRun rev. B, el set `outrun` de MAME: los que salen sueltos al
+descomprimir `outrun.zip`. Las subcarpetas del zip (`outrunb`, `outrunra`, `outrundx`, …) son
+otras versiones y no hacen falta. Ojo: `outrunb` es una versión pirata de la época, no la rev. B.
+
+En total ocupan 2.064.384 bytes (1,97 MB).
+
+| Fichero | Tamaño | CRC32 | Contenido |
+|---|---:|---|---|
+| `epr-10380b.133` | 64 KB (65.536 B) | `1f6cadad` | CPU principal |
+| `epr-10382b.118` | 64 KB (65.536 B) | `c4c3fa1a` | CPU principal |
+| `epr-10381b.132` | 64 KB (65.536 B) | `be8c412b` | CPU principal |
+| `epr-10383b.117` | 64 KB (65.536 B) | `10a2014a` | CPU principal |
+| `epr-10327a.76` | 64 KB (65.536 B) | `e28a5baf` | CPU secundaria |
+| `epr-10329a.58` | 64 KB (65.536 B) | `da131c81` | CPU secundaria |
+| `epr-10328a.75` | 64 KB (65.536 B) | `d5ec5e5d` | CPU secundaria |
+| `epr-10330a.57` | 64 KB (65.536 B) | `ba9ec82a` | CPU secundaria |
+| `epr-10187.88` | 32 KB (32.768 B) | `a10abaa9` | Programa de sonido |
+| `opr-10193.66` | 32 KB (32.768 B) | `bcd10dde` | Muestras de sonido |
+| `opr-10192.67` | 32 KB (32.768 B) | `770f1270` | Muestras de sonido |
+| `opr-10191.68` | 32 KB (32.768 B) | `20a284ab` | Muestras de sonido |
+| `opr-10190.69` | 32 KB (32.768 B) | `7cab70e2` | Muestras de sonido |
+| `opr-10189.70` | 32 KB (32.768 B) | `01366b54` | Muestras de sonido |
+| `opr-10188.71` | 32 KB (32.768 B) | `bad30ad9` | Muestras de sonido |
+| `opr-10185.11` | 32 KB (32.768 B) | `22794426` | Carretera |
+| `opr-10186.47` | 32 KB (32.768 B) | `22794426` | Carretera |
+| `opr-10268.99` | 32 KB (32.768 B) | `95344b04` | Fondos (tiles) |
+| `opr-10232.102` | 32 KB (32.768 B) | `776ba1eb` | Fondos (tiles) |
+| `opr-10267.100` | 32 KB (32.768 B) | `a85bb823` | Fondos (tiles) |
+| `opr-10231.103` | 32 KB (32.768 B) | `8908bcbf` | Fondos (tiles) |
+| `opr-10266.101` | 32 KB (32.768 B) | `9f6f1a74` | Fondos (tiles) |
+| `opr-10230.104` | 32 KB (32.768 B) | `686f5e50` | Fondos (tiles) |
+| `mpr-10371.9` | 128 KB (131.072 B) | `7cc86208` | Sprites |
+| `mpr-10373.10` | 128 KB (131.072 B) | `b0d26ac9` | Sprites |
+| `mpr-10375.11` | 128 KB (131.072 B) | `59b60bd7` | Sprites |
+| `mpr-10377.12` | 128 KB (131.072 B) | `17a1b04a` | Sprites |
+| `mpr-10372.13` | 128 KB (131.072 B) | `b557078c` | Sprites |
+| `mpr-10374.14` | 128 KB (131.072 B) | `8051e517` | Sprites |
+| `mpr-10376.15` | 128 KB (131.072 B) | `f3b8f318` | Sprites |
+| `mpr-10378.16` | 128 KB (131.072 B) | `a1062984` | Sprites |
+
+Los nombres pueden variar: si un fichero no coincide por nombre, se busca por su CRC.
+
 ## Controles
 
 | Botón | Acción |
