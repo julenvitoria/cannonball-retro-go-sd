@@ -1,0 +1,15 @@
+Cannonball for the Game & Watch (Retro-Go SD homebrew)
+
+This repository is a derivative of Cannonball, so the program built from it is distributed
+under Cannonball's license: external/cannonball/license.txt (Copyright Chris White and the
+Cannonball team; non-commercial use only; modified versions must ship their complete source).
+
+Components:
+  external/cannonball/   Cannonball engine (djyt/cannonball), with the minimal patch applied by
+                         tools/prepare_cannonball.py. License: external/cannonball/license.txt
+  sdk/                   Retro-Go SD core SDK. License: sdk/LICENSE (MIT); the vendored headers
+                         under sdk/include/ keep their original licenses (GPL / ST vendor terms).
+  src/, tools/, Makefile Game & Watch port. Distributed under the same terms as Cannonball.
+
+OutRun is a trademark of SEGA Corporation. This project is not affiliated with SEGA.
+No ROM data is included: the game needs the user's own OutRun rev. B ROM set.

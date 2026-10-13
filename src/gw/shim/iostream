@@ -1,0 +1,16 @@
+// Game & Watch port: Cannonball only uses std::cout/std::cerr for debug messages. A real
+// <iostream> would pull in locales and the whole iostream library (hundreds of KB), so this
+// header swallows everything written to them.
+#pragma once
+namespace std {
+struct gw_null_ostream
+{
+    template <class T> gw_null_ostream& operator<<(const T&) { return *this; }
+    gw_null_ostream& operator<<(gw_null_ostream& (*)(gw_null_ostream&)) { return *this; }
+};
+extern gw_null_ostream cout, cerr;
+inline gw_null_ostream& endl(gw_null_ostream& s) { return s; }
+inline gw_null_ostream& hex(gw_null_ostream& s)  { return s; }
+inline gw_null_ostream& dec(gw_null_ostream& s)  { return s; }
+inline gw_null_ostream& flush(gw_null_ostream& s) { return s; }
+}
