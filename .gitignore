@@ -1,0 +1,7 @@
+build/
+__pycache__/
+*.o
+*.d
+# ROMs and data built from them never go in the repo
+*.dat
+roms/

@@ -1,0 +1,8 @@
+// Game & Watch port: <iomanip> for the null std::cout of shim/iostream (debug output only).
+#pragma once
+#include <iostream>
+namespace std {
+struct gw_null_manip {};
+inline gw_null_manip setw(int)      { return gw_null_manip(); }
+inline gw_null_manip setfill(char)  { return gw_null_manip(); }
+}
