@@ -1,144 +1,146 @@
-# Cannonball (OutRun) para Game & Watch — homebrew de Retro-Go SD
+# Cannonball (OutRun) for Game & Watch — Retro-Go SD homebrew
 
-Port de [Cannonball](https://github.com/djyt/cannonball), el motor de OutRun de Chris White, como
-homebrew GWHB para el firmware Retro-Go SD 2.x (rama `external_cores`).
+**English** | [Español](README.es.md)
 
-- Juego original a 30 fps, como la recreativa. Sonido de los chips reales (SegaPCM + YM2151) a
-  22 050 Hz.
-- No incluye nada del juego: usa tus ROMs de OutRun rev. B y las convierte en la consola la
-  primera vez.
+Port of [Cannonball](https://github.com/djyt/cannonball), Chris White's OutRun engine, as a GWHB
+homebrew for the Retro-Go SD 2.x firmware (`external_cores` branch).
 
-## Instalación
+- The original game at 30 fps, like the arcade. Sound from the real chips (SegaPCM + YM2151) at
+  22,050 Hz.
+- Contains nothing from the game: it uses your own OutRun rev. B ROMs and converts them on the
+  console the first time.
 
-En la SD:
+## Installation
 
-    /homebrews/Cannonball.bin        <- este programa
-    /homebrews/cannonball/           <- las ROMs de OutRun rev. B (el contenido de outrun.zip, descomprimido)
+On the SD card:
 
-Las ROMs van directamente dentro de `/homebrews/cannonball/`, sin subcarpetas. El firmware oculta
-esa carpeta en el menú, porque no contiene ningún homebrew.
+    /homebrews/Cannonball.bin        <- this program
+    /homebrews/cannonball/           <- the OutRun rev. B ROMs (the contents of outrun.zip, unzipped)
 
-En el menú, pestaña Homebrew → Cannonball.
+The ROMs go directly inside `/homebrews/cannonball/`, with no subfolders. The firmware hides that
+folder in the menu, because it contains no homebrew.
 
-La primera vez comprueba las ROMs, crea `/homebrews/cannonball/outrun.dat` (2,3 MB, con las ROMs
-ya ordenadas y convertidas) y lo copia a la flash externa. Las siguientes veces arranca
-directamente. Una vez creado `outrun.dat`, las ROMs ya no hacen falta.
+In the menu: Homebrew tab → Cannonball.
 
-Las ROMs se buscan por nombre y, si el nombre no coincide, por CRC (como hace Cannonball), así
-que sirve el set de MAME `outrun` (rev. B). Si falta alguna o no es la revisión B, sale un
-mensaje con el nombre del fichero.
+The first time, it checks the ROMs, creates `/homebrews/cannonball/outrun.dat` (2.3 MB, with the
+ROMs already sorted and converted) and copies it to the external flash. After that it starts
+straight away. Once `outrun.dat` exists, the ROMs are no longer needed.
 
-Si alguna vez la flash externa se borra o se reescribe (por ejemplo con una actualización), el
-programa lo detecta y vuelve a copiar `outrun.dat`. Si aun así algo falla, basta con borrar
-`outrun.dat` y se regenera desde las ROMs.
+ROMs are looked up by name and, if the name does not match, by CRC (as Cannonball does), so the
+MAME `outrun` set (rev. B) works. If one is missing or is not revision B, a message names the
+file.
 
-## ROMs necesarias
+If the external flash is ever erased or rewritten (for example by an update), the program notices
+and copies `outrun.dat` again. If something still fails, delete `outrun.dat` and it is rebuilt
+from the ROMs.
 
-Son los 31 ficheros de OutRun rev. B, el set `outrun` de MAME: los que salen sueltos al
-descomprimir `outrun.zip`. Las subcarpetas del zip (`outrunb`, `outrunra`, `outrundx`, …) son
-otras versiones y no hacen falta. Ojo: `outrunb` es una versión pirata de la época, no la rev. B.
+## Required ROMs
 
-En total ocupan 2.064.384 bytes (1,97 MB).
+The 31 files of OutRun rev. B, MAME's `outrun` set: the loose files you get when unzipping
+`outrun.zip`. The zip's subfolders (`outrunb`, `outrunra`, `outrundx`, …) are other versions and
+are not needed. Note: `outrunb` is a bootleg from the time, not rev. B.
 
-| Fichero | Tamaño | CRC32 | Contenido |
+Together they take 2,064,384 bytes (1.97 MB).
+
+| File | Size | CRC32 | Contents |
 |---|---:|---|---|
-| `epr-10380b.133` | 64 KB (65.536 B) | `1f6cadad` | CPU principal |
-| `epr-10382b.118` | 64 KB (65.536 B) | `c4c3fa1a` | CPU principal |
-| `epr-10381b.132` | 64 KB (65.536 B) | `be8c412b` | CPU principal |
-| `epr-10383b.117` | 64 KB (65.536 B) | `10a2014a` | CPU principal |
-| `epr-10327a.76` | 64 KB (65.536 B) | `e28a5baf` | CPU secundaria |
-| `epr-10329a.58` | 64 KB (65.536 B) | `da131c81` | CPU secundaria |
-| `epr-10328a.75` | 64 KB (65.536 B) | `d5ec5e5d` | CPU secundaria |
-| `epr-10330a.57` | 64 KB (65.536 B) | `ba9ec82a` | CPU secundaria |
-| `epr-10187.88` | 32 KB (32.768 B) | `a10abaa9` | Programa de sonido |
-| `opr-10193.66` | 32 KB (32.768 B) | `bcd10dde` | Muestras de sonido |
-| `opr-10192.67` | 32 KB (32.768 B) | `770f1270` | Muestras de sonido |
-| `opr-10191.68` | 32 KB (32.768 B) | `20a284ab` | Muestras de sonido |
-| `opr-10190.69` | 32 KB (32.768 B) | `7cab70e2` | Muestras de sonido |
-| `opr-10189.70` | 32 KB (32.768 B) | `01366b54` | Muestras de sonido |
-| `opr-10188.71` | 32 KB (32.768 B) | `bad30ad9` | Muestras de sonido |
-| `opr-10185.11` | 32 KB (32.768 B) | `22794426` | Carretera |
-| `opr-10186.47` | 32 KB (32.768 B) | `22794426` | Carretera |
-| `opr-10268.99` | 32 KB (32.768 B) | `95344b04` | Fondos (tiles) |
-| `opr-10232.102` | 32 KB (32.768 B) | `776ba1eb` | Fondos (tiles) |
-| `opr-10267.100` | 32 KB (32.768 B) | `a85bb823` | Fondos (tiles) |
-| `opr-10231.103` | 32 KB (32.768 B) | `8908bcbf` | Fondos (tiles) |
-| `opr-10266.101` | 32 KB (32.768 B) | `9f6f1a74` | Fondos (tiles) |
-| `opr-10230.104` | 32 KB (32.768 B) | `686f5e50` | Fondos (tiles) |
-| `mpr-10371.9` | 128 KB (131.072 B) | `7cc86208` | Sprites |
-| `mpr-10373.10` | 128 KB (131.072 B) | `b0d26ac9` | Sprites |
-| `mpr-10375.11` | 128 KB (131.072 B) | `59b60bd7` | Sprites |
-| `mpr-10377.12` | 128 KB (131.072 B) | `17a1b04a` | Sprites |
-| `mpr-10372.13` | 128 KB (131.072 B) | `b557078c` | Sprites |
-| `mpr-10374.14` | 128 KB (131.072 B) | `8051e517` | Sprites |
-| `mpr-10376.15` | 128 KB (131.072 B) | `f3b8f318` | Sprites |
-| `mpr-10378.16` | 128 KB (131.072 B) | `a1062984` | Sprites |
+| `epr-10380b.133` | 64 KB (65,536 B) | `1f6cadad` | Main CPU |
+| `epr-10382b.118` | 64 KB (65,536 B) | `c4c3fa1a` | Main CPU |
+| `epr-10381b.132` | 64 KB (65,536 B) | `be8c412b` | Main CPU |
+| `epr-10383b.117` | 64 KB (65,536 B) | `10a2014a` | Main CPU |
+| `epr-10327a.76` | 64 KB (65,536 B) | `e28a5baf` | Sub CPU |
+| `epr-10329a.58` | 64 KB (65,536 B) | `da131c81` | Sub CPU |
+| `epr-10328a.75` | 64 KB (65,536 B) | `d5ec5e5d` | Sub CPU |
+| `epr-10330a.57` | 64 KB (65,536 B) | `ba9ec82a` | Sub CPU |
+| `epr-10187.88` | 32 KB (32,768 B) | `a10abaa9` | Sound program |
+| `opr-10193.66` | 32 KB (32,768 B) | `bcd10dde` | Sound samples |
+| `opr-10192.67` | 32 KB (32,768 B) | `770f1270` | Sound samples |
+| `opr-10191.68` | 32 KB (32,768 B) | `20a284ab` | Sound samples |
+| `opr-10190.69` | 32 KB (32,768 B) | `7cab70e2` | Sound samples |
+| `opr-10189.70` | 32 KB (32,768 B) | `01366b54` | Sound samples |
+| `opr-10188.71` | 32 KB (32,768 B) | `bad30ad9` | Sound samples |
+| `opr-10185.11` | 32 KB (32,768 B) | `22794426` | Road |
+| `opr-10186.47` | 32 KB (32,768 B) | `22794426` | Road |
+| `opr-10268.99` | 32 KB (32,768 B) | `95344b04` | Backgrounds (tiles) |
+| `opr-10232.102` | 32 KB (32,768 B) | `776ba1eb` | Backgrounds (tiles) |
+| `opr-10267.100` | 32 KB (32,768 B) | `a85bb823` | Backgrounds (tiles) |
+| `opr-10231.103` | 32 KB (32,768 B) | `8908bcbf` | Backgrounds (tiles) |
+| `opr-10266.101` | 32 KB (32,768 B) | `9f6f1a74` | Backgrounds (tiles) |
+| `opr-10230.104` | 32 KB (32,768 B) | `686f5e50` | Backgrounds (tiles) |
+| `mpr-10371.9` | 128 KB (131,072 B) | `7cc86208` | Sprites |
+| `mpr-10373.10` | 128 KB (131,072 B) | `b0d26ac9` | Sprites |
+| `mpr-10375.11` | 128 KB (131,072 B) | `59b60bd7` | Sprites |
+| `mpr-10377.12` | 128 KB (131,072 B) | `17a1b04a` | Sprites |
+| `mpr-10372.13` | 128 KB (131,072 B) | `b557078c` | Sprites |
+| `mpr-10374.14` | 128 KB (131,072 B) | `8051e517` | Sprites |
+| `mpr-10376.15` | 128 KB (131,072 B) | `f3b8f318` | Sprites |
+| `mpr-10378.16` | 128 KB (131,072 B) | `a1062984` | Sprites |
 
-Los nombres pueden variar: si un fichero no coincide por nombre, se busca por su CRC.
+Names may differ: if a file does not match by name, it is found by its CRC.
 
-## Controles
+## Controls
 
-| Botón | Acción |
+| Button | Action |
 |---|---|
-| Izquierda / derecha | Volante (y elegir canción / ruta) |
-| A | Acelerar |
-| B | Frenar |
-| Arriba / abajo | Marcha larga / corta |
+| Left / right | Steering (and choosing the song / route) |
+| A | Accelerate |
+| B | Brake |
+| Up / down | High / low gear |
 | GAME | Start |
-| TIME | Moneda (no hace falta: está en *free play*) |
-| PAUSE/SET | Menú de Retro-Go |
+| TIME | Coin (not needed: it runs in *free play*) |
+| PAUSE/SET | Retro-Go menu |
 
-En el menú de pausa, Opciones → Marchas: manual o automática.
+In the pause menu, Options → Gears: manual or automatic.
 
-Las puntuaciones se guardan en `/homebrews/cannonball/hiscores*.bin`.
+High scores are saved in `/homebrews/cannonball/hiscores*.bin`.
 
-## Compilar
+## Building
 
-Con el Arm GNU Toolchain 15.2.rel1 (el mismo que usa retro-go-sd):
+With the Arm GNU Toolchain 15.2.rel1 (the same one retro-go-sd uses):
 
-    make GCC_PATH=/ruta/a/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/bin
+    make GCC_PATH=/path/to/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/bin
 
-O con Docker: `make docker`. Sale `build/Cannonball.bin`.
+Or with Docker: `make docker`. The result is `build/Cannonball.bin`.
 
-`external/cannonball` es djyt/cannonball 27493eb con un parche mínimo que aplica
-`tools/prepare_cannonball.py` (para regenerarlo: `tools/prepare_cannonball.py /ruta/a/cannonball`).
-El parche solo cambia *dónde* viven los datos grandes; la lógica del juego, el render y el sonido
-no se tocan.
+`external/cannonball` is djyt/cannonball 27493eb with a minimal patch applied by
+`tools/prepare_cannonball.py` (to regenerate it: `tools/prepare_cannonball.py /path/to/cannonball`).
+The patch only changes *where* the large data lives; game logic, rendering and sound are untouched.
 
-## Cómo está hecho
+## How it is laid out
 
-| Qué | Dónde | Tamaño |
+| What | Where | Size |
 |---|---|---|
-| Código + datos del motor | RAM_EMU | 130 KB de código, 400 KB de BSS |
-| Sprites, tiles, ROMs de CPU, muestras PCM | Flash externa (`outrun.dat`) | 2,3 MB |
-| Carretera decodificada | RAM_EMU | 257 KB |
-| Buffer del frame (índices de paleta) | RAM_EMU | 140 KB |
-| RAM de tiles y texto (`hwtiles`) | DTCM | 68 KB |
+| Engine code + data | RAM_EMU | 130 KB of code, 400 KB of BSS |
+| Sprites, tiles, CPU ROMs, PCM samples | External flash (`outrun.dat`) | 2.3 MB |
+| Decoded road | RAM_EMU | 257 KB |
+| Frame buffer (palette indices) | RAM_EMU | 140 KB |
+| Tile and text RAM (`hwtiles`) | DTCM | 68 KB |
 
-Queda unos 15 KB libres en RAM_EMU y 36 KB en DTCM. Esta disposición es la que salió mejor en el
-benchmark en la consola (`cannonball_bench`): la carretera en RAM y los tiles en flash.
+About 15 KB of RAM_EMU and 36 KB of DTCM are left free. This layout was the fastest in the
+on-console benchmark (`cannonball_bench`): the road in RAM and the tiles in flash.
 
-Ficheros del port (`src/gw/`):
+Port files (`src/gw/`):
 
-- `main_cannonball.c`: lado del firmware (arranque, conversión, entrada, ritmo, audio, menú).
-- `gw_engine.cpp`: lo que hacían `main.cpp` y la capa SDL de Cannonball.
-- `romconv.cpp`: crea `outrun.dat` desde las ROMs.
-- `roms_gw.cpp`, `config_gw.cpp`, `utils_gw.cpp`: sustituyen a los de Cannonball (sin XML, sin
-  iostreams, ROMs leídas directamente de la flash).
-- `cxx_runtime_gw.cpp`: la parte mínima de libstdc++ que usa el motor.
-- `shim/`: cabeceras sustitutas (tipos de SDL, `iostream` vacío).
+- `main_cannonball.c`: firmware side (startup, conversion, input, timing, audio, menu).
+- `gw_engine.cpp`: what Cannonball's `main.cpp` and SDL layer used to do.
+- `romconv.cpp`: builds `outrun.dat` from the ROMs.
+- `roms_gw.cpp`, `config_gw.cpp`, `utils_gw.cpp`: replace Cannonball's (no XML, no iostreams,
+  ROMs read straight from flash).
+- `cxx_runtime_gw.cpp`: the minimal part of libstdc++ the engine uses.
+- `shim/`: replacement headers (SDL types, empty `iostream`).
 
-## Estado
+## Status
 
-- Probado en el emulador gwemu con el firmware `external_cores` (b791f15):
-  - conversión de ROMs y copia a flash;
-  - los datos convertidos son idénticos bit a bit a los que genera Cannonball;
-  - modo attract, selección de música, carrera, choque, menú de pausa, opciones, salir al menú,
-    apagado, mensaje sin ROMs y recuperación de una copia en flash obsoleta.
-- Sin probar en la consola. El benchmark previo, en la consola a 280 MHz, dio unos 19 ms por frame
-  de media sobre un presupuesto de 33 ms.
+- Tested in the gwemu emulator with the `external_cores` firmware (b791f15):
+  - ROM conversion and copy to flash;
+  - the converted data is bit-identical to what Cannonball produces;
+  - attract mode, music selection, racing, crashing, pause menu, options, exit to menu,
+    power-off, missing-ROM message and recovery from a stale flash copy.
+- Also tested on the console. The earlier benchmark, on the console at 280 MHz, averaged about
+  19 ms per frame against a 33 ms budget.
 
-## Licencia
+## License
 
-Cannonball es de Chris White y se distribuye bajo su licencia (`external/cannonball/license.txt`):
-uso no comercial. OutRun es de SEGA; las ROMs no se incluyen.
+Cannonball is by Chris White and is distributed under its own license
+(`external/cannonball/license.txt`): non-commercial use. OutRun is SEGA's; the ROMs are not
+included.
