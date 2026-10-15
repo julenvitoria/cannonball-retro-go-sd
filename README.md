@@ -90,7 +90,23 @@ Names may differ: if a file does not match by name, it is found by its CRC.
 | TIME | Coin (not needed: it runs in *free play*) |
 | PAUSE/SET | Retro-Go menu |
 
-In the pause menu, Options → Gears: manual or automatic.
+## Menu
+
+The game starts on Cannonball's menu (OutRun logo over the scrolling road):
+
+- **PLAY GAME**: goes to the game (attract mode; GAME starts a race).
+- **SETTINGS**: left/right or A change the value, B goes back.
+  - **GEARS**: manual (up/down = high/low) or automatic.
+  - **TIME**: easy, normal, hard, hardest or infinite.
+  - **TRAFFIC**: easy, normal, hard, hardest or none.
+- **EXIT**: back to Retro-Go.
+
+In the menu: up/down to move, A or GAME to choose. To go back to the menu from the game: PAUSE/SET
+→ Options → **Cannonball menu**.
+
+The menu follows the Retro-Go language for English, Spanish, Portuguese, French, Italian, German and
+Norwegian, without accents (the OutRun font has none); other languages use English. The settings
+are kept by the firmware with the homebrew's other settings, so they survive restarts.
 
 High scores are saved in `/homebrews/cannonball/hiscores*.bin`.
 
@@ -134,6 +150,8 @@ Port files (`src/gw/`):
 - Tested in the gwemu emulator with the `external_cores` firmware (b791f15):
   - ROM conversion and copy to flash;
   - the converted data is bit-identical to what Cannonball produces;
+  - front-end menu (settings saved across restarts, Spanish and German labels), back to the menu
+    from the pause menu, EXIT;
   - attract mode, music selection, racing, crashing, pause menu, options, exit to menu,
     power-off, missing-ROM message and recovery from a stale flash copy.
 - Also tested on the console. The earlier benchmark, on the console at 280 MHz, averaged about

@@ -50,7 +50,7 @@ void Config::load()
 
     smartypi.enabled = 0; smartypi.ouputs = 0; smartypi.cabinet = CABINET_UPRIGHT;
 
-    controls.gear = controls.GEAR_SEPARATE;   // D-pad up/down = high/low (pause menu: automatic)
+    controls.gear = controls.GEAR_SEPARATE;   // D-pad up/down = high/low (menu: automatic)
     controls.steer_speed = 3;
     controls.pedal_speed = 4;
     controls.analog = 0;
