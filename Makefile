@@ -21,6 +21,7 @@ CORE_C_SOURCES := src/gw/main_cannonball.c
 
 CORE_CXX_SOURCES := \
 src/gw/gw_engine.cpp \
+src/gw/gw_menu.cpp \
 src/gw/config_gw.cpp \
 src/gw/roms_gw.cpp \
 src/gw/romconv.cpp \

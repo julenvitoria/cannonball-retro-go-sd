@@ -180,9 +180,10 @@ void Render::draw_frame(uint16_t* px)
 }
 
 // ------------------------------------------------------------------------------------------------
-// main.cpp's tick(), minus SDL events, menu and rumble
+// main.cpp's tick(), minus SDL events and rumble (the menu is gw_menu.cpp)
 // ------------------------------------------------------------------------------------------------
 static bool pause_engine = false;
+void gw_menu_state_tick(void);
 
 void cb_engine_tick(void)
 {
@@ -207,6 +208,10 @@ void cb_engine_tick(void)
             tick_frame = true; pause_engine = false;
             outrun.init();
             state = STATE_GAME;
+            break;
+        case STATE_INIT_MENU:
+        case STATE_MENU:
+            gw_menu_state_tick();       // gw_menu.cpp
             break;
         default:
             break;
@@ -236,6 +241,6 @@ bool cb_engine_init(const uint8_t* dat)
     config.set_fps(config.video.fps);                // also initialises the sound chips
     if (!video.init(&roms, &config.video)) return false;   // decodes the road into g_road
     audio.init();
-    state = STATE_INIT_GAME;
+    state = STATE_INIT_MENU;           // start on the front-end menu, as Cannonball does
     return true;
 }

@@ -11,7 +11,8 @@
  *   /homebrews/cannonball/hiscores*.bin  high scores
  *
  * Controls: D-pad left/right steer, A accelerate, B brake, up/down gear high/low,
- * GAME start, TIME coin. PAUSE/SET opens the Retro-Go menu (gears: manual/automatic).
+ * GAME start, TIME coin. Starts on Cannonball's menu (play, settings, exit).
+ * PAUSE/SET opens the Retro-Go menu ("Cannonball menu" goes back to the game's menu).
  *
  * Entry (run_gwhb_homebrew):
  *   void app_main(uint8_t load_state, uint8_t start_paused, int8_t save_slot)
@@ -35,6 +36,7 @@
 
 #include "gw_core_bridge.h"
 #include "gw_core_i18n.h"
+#include "gw_firmware_abi.h"
 
 static odroid_gamepad_state_t joystick;
 static int16_t g_mix[CB_SAMPLES];
@@ -137,27 +139,45 @@ static const uint8_t *prepare_data(void)
 // ------------------------------------------------------------------------------------------------
 // Pause menu
 // ------------------------------------------------------------------------------------------------
-static const gw_i18n_entry_t i18n_gears[] = {
-    { "en", "Gears" }, { "es", "Marchas" }, { "fr", "Vitesses" }, { "de", "Gänge" }, { "it", "Marce" },
+static const gw_i18n_entry_t i18n_game_menu[] = {
+    { "en", "Cannonball menu" }, { "es", "Menú de Cannonball" }, { "pt", "Menu do Cannonball" },
+    { "fr", "Menu de Cannonball" }, { "de", "Cannonball-Menü" }, { "it", "Menu di Cannonball" },
+    { "no", "Cannonball-meny" },
     GW_I18N_END
 };
-static const gw_i18n_entry_t i18n_manual[] = {
-    { "en", "Manual" }, { "es", "Manual" }, { "fr", "Manuelles" }, { "de", "Manuell" }, { "it", "Manuali" },
-    GW_I18N_END
-};
-static const gw_i18n_entry_t i18n_auto[] = {
-    { "en", "Automatic" }, { "es", "Automático" }, { "fr", "Automatiques" }, { "de", "Automatik" }, { "it", "Automatiche" },
-    GW_I18N_END
-};
-static char g_gears_value[24];
 
-static bool gears_cb(odroid_dialog_choice_t *option, odroid_dialog_event_t event, uint32_t repeat)
+// "Cannonball menu" in the pause menu: back to the game's front-end menu
+static bool game_menu_cb(odroid_dialog_choice_t *option, odroid_dialog_event_t event, uint32_t repeat)
 {
-    (void)repeat;
-    if (event == ODROID_DIALOG_PREV || event == ODROID_DIALOG_NEXT || event == ODROID_DIALOG_ENTER)
-        cb_engine_set_auto_gears(!cb_engine_get_auto_gears());
-    strncpy(option->value, gw_i18n(cb_engine_get_auto_gears() ? i18n_auto : i18n_manual), sizeof g_gears_value - 1);
-    return event == ODROID_DIALOG_ENTER;
+    (void)option; (void)repeat;
+    if (event == ODROID_DIALOG_ENTER) {
+        cb_engine_go_menu();
+        return true;                       // close the pause menu
+    }
+    return false;
+}
+
+// ------------------------------------------------------------------------------------------------
+// Settings: kept by the firmware with the homebrew's other settings (app_int32 keys)
+// ------------------------------------------------------------------------------------------------
+int32_t odroid_settings_app_int32_get(const char *key, int32_t default_value);
+void    odroid_settings_app_int32_set(const char *key, int32_t value);
+
+static void settings_load(void)
+{
+    cb_engine_set_settings(odroid_settings_app_int32_get("cb_autogear", 0),
+                           odroid_settings_app_int32_get("cb_time", 0),
+                           odroid_settings_app_int32_get("cb_traffic", 1));
+}
+
+static void settings_store_if_changed(void)
+{
+    int gears, time, traffic;
+    if (!cb_engine_take_settings(&gears, &time, &traffic))
+        return;
+    odroid_settings_app_int32_set("cb_autogear", gears);
+    odroid_settings_app_int32_set("cb_time", time);
+    odroid_settings_app_int32_set("cb_traffic", traffic);
 }
 
 static void repaint(void)
@@ -232,6 +252,13 @@ void app_main(uint8_t load_state, uint8_t start_paused, int8_t save_slot)
         return;
     }
 
+    settings_load();
+#ifdef CB_TEST_LANG     /* emulator tests: force a menu language, e.g. -DCB_TEST_LANG=\"es_es\" */
+    cb_engine_set_lang(CB_TEST_LANG);
+#else
+    cb_engine_set_lang(gw_firmware_abi()->i18n_lang_code());
+#endif
+
     printf("Cannonball: running, RAM_EMU free %u, DTCM free %u\n",
            (unsigned)ram_get_free_size(), (unsigned)dtc_get_free_size());
 
@@ -255,10 +282,9 @@ void app_main(uint8_t load_state, uint8_t start_paused, int8_t save_slot)
         odroid_input_read_gamepad(&joystick);
 
         odroid_dialog_choice_t options[] = {
-            {300, gw_i18n(i18n_gears), g_gears_value, 1, &gears_cb},
+            {300, gw_i18n(i18n_game_menu), "", 1, &game_menu_cb},
             ODROID_DIALOG_CHOICE_LAST
         };
-        strncpy(g_gears_value, gw_i18n(cb_engine_get_auto_gears() ? i18n_auto : i18n_manual), sizeof g_gears_value - 1);
         common_emu_input_loop(&joystick, options, &repaint);
 
         cb_engine_set_buttons(read_buttons(&joystick));
@@ -266,6 +292,9 @@ void app_main(uint8_t load_state, uint8_t start_paused, int8_t save_slot)
         bool draw = common_emu_frame_loop();
 
         cb_engine_tick();
+        settings_store_if_changed();
+        if (cb_engine_exit_requested())
+            odroid_system_switch_app(0);    // EXIT in the game's menu: back to Retro-Go
         cb_engine_audio(g_mix, CB_SAMPLES, common_emu_sound_get_volume());
 
         if (draw)

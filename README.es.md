@@ -90,7 +90,23 @@ Los nombres pueden variar: si un fichero no coincide por nombre, se busca por su
 | TIME | Moneda (no hace falta: está en *free play*) |
 | PAUSE/SET | Menú de Retro-Go |
 
-En el menú de pausa, Opciones → Marchas: manual o automática.
+## Menú
+
+El juego empieza en el menú de Cannonball (el logo de OutRun sobre la carretera):
+
+- **JUGAR**: entra al juego (modo demostración; GAME empieza una carrera).
+- **AJUSTES**: izquierda/derecha o A cambian el valor, B vuelve.
+  - **MARCHAS**: manual (arriba/abajo = larga/corta) o automático.
+  - **TIEMPO**: fácil, normal, difícil, muy difícil o infinito.
+  - **TRÁFICO**: fácil, normal, difícil, muy difícil o sin tráfico.
+- **SALIR**: vuelve a Retro-Go.
+
+En el menú: arriba/abajo para moverse, A o GAME para elegir. Para volver al menú desde el juego:
+PAUSE/SET → Opciones → **Menú de Cannonball**.
+
+El menú sale en el idioma de Retro-Go si es inglés, español, portugués, francés, italiano, alemán o
+noruego, sin tildes (la letra de OutRun no las tiene); en el resto, en inglés. Los ajustes los
+guarda el firmware junto con los demás ajustes del homebrew, así que se conservan al reiniciar.
 
 Las puntuaciones se guardan en `/homebrews/cannonball/hiscores*.bin`.
 
@@ -135,6 +151,8 @@ Ficheros del port (`src/gw/`):
 - Probado en el emulador gwemu con el firmware `external_cores` (b791f15):
   - conversión de ROMs y copia a flash;
   - los datos convertidos son idénticos bit a bit a los que genera Cannonball;
+  - menú propio (ajustes que se conservan al reiniciar, textos en español y alemán), volver al
+    menú desde el menú de pausa, SALIR;
   - modo attract, selección de música, carrera, choque, menú de pausa, opciones, salir al menú,
     apagado, mensaje sin ROMs y recuperación de una copia en flash obsoleta.
 - Probado también en la consola. El benchmark previo, en la consola a 280 MHz, dio unos 19 ms por

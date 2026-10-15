@@ -33,6 +33,14 @@ void cb_engine_render(uint16_t* lcd);          // draws the frame into a 320x240
 void cb_engine_redraw(uint16_t* lcd);          // last frame again (pause menu background)
 void cb_engine_audio(int16_t* out, int n, int volume);   // mono, volume 0..255
 
+// Front-end menu (gw_menu.cpp)
+void cb_engine_set_lang(const char* code);     // Retro-Go language code ("es_es"...)
+void cb_engine_go_menu(void);                  // back to the menu (from the pause menu)
+bool cb_engine_exit_requested(void);           // EXIT chosen in the menu (cleared on read)
+// time / traffic: 0 easy, 1 normal, 2 hard, 3 hardest, 4 infinite time / no traffic
+void cb_engine_set_settings(int auto_gears, int time, int traffic);
+bool cb_engine_take_settings(int* auto_gears, int* time, int* traffic);  // true if changed
+
 #ifdef __cplusplus
 }
 #endif
