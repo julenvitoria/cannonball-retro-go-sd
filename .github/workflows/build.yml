@@ -23,6 +23,10 @@ jobs:
         run: |
           tar -xf toolchain.tar.xz
 
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install pillow
+
       - name: Build
         run: |
           TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d -name "arm-gnu-toolchain-*")
