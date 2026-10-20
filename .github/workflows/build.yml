@@ -1,0 +1,38 @@
+name: Build CannonBall
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Download ARM Toolchain 15.2
+        run: |
+          wget -O toolchain.tar.xz \
+          https://gitlab.arm.com/api/v4/projects/tooling%2Fgnu-toolchains-for-arm/packages/generic/gnu-toolchain/15.2.rel1/arm-gnu-toolchain-15.2.rel1-x86\_64-arm-none-eabi.tar.xz
+
+      - name: Extract Toolchain
+        run: |
+          tar -xf toolchain.tar.xz
+
+      - name: Build
+        run: |
+          TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d -name "arm-gnu-toolchain-*")
+          make GCC_PATH=$TOOLCHAIN_DIR/bin
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cannonball-build
+          path: |
+            **/*.bin
+            **/*.elf
+            **/*.hex
