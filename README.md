@@ -99,6 +99,8 @@ The game starts on Cannonball's menu (OutRun logo over the scrolling road):
   - **GEARS**: manual (up/down = high/low) or automatic.
   - **TIME**: easy, normal, hard, hardest or infinite.
   - **TRAFFIC**: easy, normal, hard, hardest or none.
+  - **STEERING**: 1 to 9, how fast the car turns while left/right is held (the D-pad is digital,
+    so the wheel turns step by step; 3 is Cannonball's default, higher answers sooner).
 - **EXIT**: back to Retro-Go.
 
 In the menu: up/down to move, A or GAME to choose. To go back to the menu from the game: PAUSE/SET

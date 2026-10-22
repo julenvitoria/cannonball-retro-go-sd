@@ -31,26 +31,26 @@
 // ------------------------------------------------------------------------------------------------
 enum {
     S_PLAY, S_SETTINGS, S_EXIT, S_GEARS, S_MANUAL, S_AUTO, S_TIME, S_TRAFFIC,
-    S_EASY, S_NORMAL, S_HARD, S_HARDEST, S_INFINITE, S_NONE, S_BACK, S_COUNT
+    S_EASY, S_NORMAL, S_HARD, S_HARDEST, S_INFINITE, S_NONE, S_BACK, S_STEER, S_COUNT
 };
 
 struct lang_t { const char* code; const char* s[S_COUNT]; };
 
 static const lang_t LANGS[] = {
     { "en", { "PLAY GAME", "SETTINGS", "EXIT", "GEARS", "MANUAL", "AUTOMATIC", "TIME", "TRAFFIC",
-              "EASY", "NORMAL", "HARD", "HARDEST", "INFINITE", "NONE", "BACK" } },
+              "EASY", "NORMAL", "HARD", "HARDEST", "INFINITE", "NONE", "BACK", "STEERING" } },
     { "es", { "JUGAR", "AJUSTES", "SALIR", "MARCHAS", "MANUAL", "AUTOMATICO", "TIEMPO", "TRAFICO",
-              "FACIL", "NORMAL", "DIFICIL", "MUY DIFICIL", "INFINITO", "SIN TRAFICO", "VOLVER" } },
+              "FACIL", "NORMAL", "DIFICIL", "MUY DIFICIL", "INFINITO", "SIN TRAFICO", "VOLVER", "DIRECCION" } },
     { "pt", { "JOGAR", "DEFINICOES", "SAIR", "MUDANCAS", "MANUAL", "AUTOMATICO", "TEMPO", "TRANSITO",
-              "FACIL", "NORMAL", "DIFICIL", "MUITO DIFICIL", "INFINITO", "SEM TRANSITO", "VOLTAR" } },
+              "FACIL", "NORMAL", "DIFICIL", "MUITO DIFICIL", "INFINITO", "SEM TRANSITO", "VOLTAR", "DIRECAO" } },
     { "fr", { "JOUER", "PARAMETRES", "QUITTER", "VITESSES", "MANUELLES", "AUTOMATIQUES", "TEMPS", "TRAFIC",
-              "FACILE", "NORMAL", "DIFFICILE", "TRES DIFFICILE", "INFINI", "AUCUN", "RETOUR" } },
+              "FACILE", "NORMAL", "DIFFICILE", "TRES DIFFICILE", "INFINI", "AUCUN", "RETOUR", "DIRECTION" } },
     { "it", { "GIOCA", "IMPOSTAZIONI", "ESCI", "CAMBIO", "MANUALE", "AUTOMATICO", "TEMPO", "TRAFFICO",
-              "FACILE", "NORMALE", "DIFFICILE", "DIFFICILISSIMO", "INFINITO", "NESSUNO", "INDIETRO" } },
+              "FACILE", "NORMALE", "DIFFICILE", "DIFFICILISSIMO", "INFINITO", "NESSUNO", "INDIETRO", "STERZO" } },
     { "de", { "SPIELEN", "EINSTELLUNGEN", "BEENDEN", "SCHALTUNG", "MANUELL", "AUTOMATIK", "ZEIT", "VERKEHR",
-              "LEICHT", "NORMAL", "SCHWER", "SEHR SCHWER", "UNENDLICH", "KEINER", "ZURUECK" } },
+              "LEICHT", "NORMAL", "SCHWER", "SEHR SCHWER", "UNENDLICH", "KEINER", "ZURUECK", "LENKUNG" } },
     { "no", { "SPILL", "INNSTILLINGER", "AVSLUTT", "GIR", "MANUELL", "AUTOMATISK", "TID", "TRAFIKK",
-              "LETT", "NORMAL", "VANSKELIG", "SVAERT VANSKELIG", "UENDELIG", "INGEN", "TILBAKE" } },
+              "LETT", "NORMAL", "VANSKELIG", "SVAERT VANSKELIG", "UENDELIG", "INGEN", "TILBAKE", "STYRING" } },
 };
 
 static const lang_t* g_lang = &LANGS[0];
@@ -73,8 +73,12 @@ static bool g_settings_dirty;
 static int  time_level(void)    { return config.engine.freeze_timer ? 4 : config.engine.dip_time; }
 static int  traffic_level(void) { return config.engine.disable_traffic ? 4 : config.engine.dip_traffic; }
 
-void cb_engine_set_settings(int auto_gears, int time, int traffic)
+void cb_engine_set_settings(int auto_gears, int time, int traffic, int steer)
 {
+    // Digital steering: how far the wheel turns per game tick (30 Hz) while left/right is held,
+    // out of 0x38 to full lock. Cannonball's default is 3 (about 0.6 s to full lock).
+    if (steer < 1 || steer > 9) steer = 3;
+    config.controls.steer_speed = steer;
     cb_engine_set_auto_gears(auto_gears != 0);
     if (time < 0 || time > 4) time = 0;
     if (traffic < 0 || traffic > 4) traffic = 1;
@@ -84,13 +88,14 @@ void cb_engine_set_settings(int auto_gears, int time, int traffic)
     config.engine.dip_traffic     = traffic == 4 ? 1 : traffic;
 }
 
-bool cb_engine_take_settings(int* auto_gears, int* time, int* traffic)
+bool cb_engine_take_settings(int* auto_gears, int* time, int* traffic, int* steer)
 {
     if (!g_settings_dirty) return false;
     g_settings_dirty = false;
     *auto_gears = cb_engine_get_auto_gears();
     *time = time_level();
     *traffic = traffic_level();
+    *steer = config.controls.steer_speed;
     return true;
 }
 
@@ -102,9 +107,9 @@ static const uint16_t ROWS         = 28;
 static const uint16_t HORIZON_DEST = 0x3A0;
 
 enum { PAGE_MAIN, PAGE_SETTINGS };
-enum { ITEM_PLAY, ITEM_SETTINGS, ITEM_EXIT, ITEM_GEARS, ITEM_TIME, ITEM_TRAFFIC, ITEM_BACK };
+enum { ITEM_PLAY, ITEM_SETTINGS, ITEM_EXIT, ITEM_GEARS, ITEM_TIME, ITEM_TRAFFIC, ITEM_STEER, ITEM_BACK };
 static const int MAIN_ITEMS[]     = { ITEM_PLAY, ITEM_SETTINGS, ITEM_EXIT };
-static const int SETTINGS_ITEMS[] = { ITEM_GEARS, ITEM_TIME, ITEM_TRAFFIC, ITEM_BACK };
+static const int SETTINGS_ITEMS[] = { ITEM_GEARS, ITEM_TIME, ITEM_TRAFFIC, ITEM_STEER, ITEM_BACK };
 
 static int  g_page, g_cursor, g_main_cursor;
 static int  g_frame;
@@ -115,7 +120,7 @@ bool cb_engine_exit_requested(void) { bool r = g_exit_requested; g_exit_requeste
 static const int* items(int* n)
 {
     if (g_page == PAGE_MAIN) { *n = 3; return MAIN_ITEMS; }
-    *n = 4;
+    *n = sizeof SETTINGS_ITEMS / sizeof SETTINGS_ITEMS[0];
     return SETTINGS_ITEMS;
 }
 
@@ -137,6 +142,11 @@ static void item_text(int item, char* out, size_t size)
         case ITEM_GEARS:    a = T(S_GEARS);   b = T(cb_engine_get_auto_gears() ? S_AUTO : S_MANUAL); break;
         case ITEM_TIME:     a = T(S_TIME);    b = level_name(time_level(), false); break;
         case ITEM_TRAFFIC:  a = T(S_TRAFFIC); b = level_name(traffic_level(), true); break;
+        case ITEM_STEER: {
+            static char num[2];
+            num[0] = (char)('0' + config.controls.steer_speed); num[1] = 0;
+            a = T(S_STEER); b = num; break;
+        }
         case ITEM_BACK:     a = T(S_BACK); break;
     }
     size_t n = 0;
@@ -227,10 +237,16 @@ static void select_item(int item, int dir)
             cb_engine_set_auto_gears(!cb_engine_get_auto_gears());
             break;
         case ITEM_TIME:
-            cb_engine_set_settings(cb_engine_get_auto_gears(), (time_level() + (dir < 0 ? 4 : 1)) % 5, traffic_level());
+            cb_engine_set_settings(cb_engine_get_auto_gears(), (time_level() + (dir < 0 ? 4 : 1)) % 5, traffic_level(),
+                                   config.controls.steer_speed);
             break;
         case ITEM_TRAFFIC:
-            cb_engine_set_settings(cb_engine_get_auto_gears(), time_level(), (traffic_level() + (dir < 0 ? 4 : 1)) % 5);
+            cb_engine_set_settings(cb_engine_get_auto_gears(), time_level(), (traffic_level() + (dir < 0 ? 4 : 1)) % 5,
+                                   config.controls.steer_speed);
+            break;
+        case ITEM_STEER:
+            cb_engine_set_settings(cb_engine_get_auto_gears(), time_level(), traffic_level(),
+                                   (config.controls.steer_speed + (dir < 0 ? 7 : 0)) % 9 + 1);
             break;
         case ITEM_BACK:
             if (dir) return;
