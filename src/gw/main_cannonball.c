@@ -167,17 +167,19 @@ static void settings_load(void)
 {
     cb_engine_set_settings(odroid_settings_app_int32_get("cb_autogear", 0),
                            odroid_settings_app_int32_get("cb_time", 0),
-                           odroid_settings_app_int32_get("cb_traffic", 1));
+                           odroid_settings_app_int32_get("cb_traffic", 1),
+                           odroid_settings_app_int32_get("cb_steer", 3));
 }
 
 static void settings_store_if_changed(void)
 {
-    int gears, time, traffic;
-    if (!cb_engine_take_settings(&gears, &time, &traffic))
+    int gears, time, traffic, steer;
+    if (!cb_engine_take_settings(&gears, &time, &traffic, &steer))
         return;
     odroid_settings_app_int32_set("cb_autogear", gears);
     odroid_settings_app_int32_set("cb_time", time);
     odroid_settings_app_int32_set("cb_traffic", traffic);
+    odroid_settings_app_int32_set("cb_steer", steer);
 }
 
 static void repaint(void)
