@@ -168,7 +168,7 @@ static void settings_load(void)
     cb_engine_set_settings(odroid_settings_app_int32_get("cb_autogear", 0),
                            odroid_settings_app_int32_get("cb_time", 0),
                            odroid_settings_app_int32_get("cb_traffic", 1),
-                           odroid_settings_app_int32_get("cb_steer", 3));
+                           odroid_settings_app_int32_get("cb_steer", 5));
 }
 
 static void settings_store_if_changed(void)
