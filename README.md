@@ -95,7 +95,13 @@ Names may differ: if a file does not match by name, it is found by its CRC.
 The game starts on Cannonball's menu (OutRun logo over the scrolling road):
 
 - **PLAY GAME**: goes to the game (attract mode; GAME starts a race).
-- **SETTINGS**: left/right or A change the value, B goes back.
+- **GAME MODES**, as in Cannonball:
+  - **CONTINUOUS MODE**: all 15 stages one after the other, with its own best scores;
+    **TRAFFIC** 0 to 8 (3 by default). **START**, then GAME on the music screen.
+  - **TIME TRIAL**: one stage against the clock; **LAPS** 1 to 5, **TRAFFIC** 0 to 8. **START**
+    shows the course map: left/right choose the stage, A or GAME start, B goes back. Best lap
+    times are kept for each stage.
+- **SETTINGS**: left/right or A change the value, B goes back (also in the game modes pages).
   - **GEARS**: manual (up/down = high/low) or automatic.
   - **TIME**: easy, normal, hard, hardest or infinite.
   - **TRAFFIC**: easy, normal, hard, hardest or none.

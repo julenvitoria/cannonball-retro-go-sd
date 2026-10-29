@@ -95,7 +95,13 @@ Los nombres pueden variar: si un fichero no coincide por nombre, se busca por su
 El juego empieza en el menú de Cannonball (el logo de OutRun sobre la carretera):
 
 - **JUGAR**: entra al juego (modo demostración; GAME empieza una carrera).
-- **AJUSTES**: izquierda/derecha o A cambian el valor, B vuelve.
+- **MODOS DE JUEGO**, como en Cannonball:
+  - **MODO CONTINUO**: las 15 etapas una detrás de otra, con sus propios récords; **TRÁFICO**
+    de 0 a 8 (3 por defecto). **EMPEZAR** y luego GAME en la pantalla de la música.
+  - **CONTRARRELOJ**: una etapa contra el reloj; **VUELTAS** de 1 a 5, **TRÁFICO** de 0 a 8.
+    **EMPEZAR** enseña el mapa: izquierda/derecha eligen la etapa, A o GAME empiezan, B vuelve. Se
+    guarda la mejor vuelta de cada etapa.
+- **AJUSTES**: izquierda/derecha o A cambian el valor, B vuelve (igual en las páginas de los modos).
   - **MARCHAS**: manual (arriba/abajo = larga/corta) o automático.
   - **TIEMPO**: fácil, normal, difícil, muy difícil o infinito.
   - **TRÁFICO**: fácil, normal, difícil, muy difícil o sin tráfico.
