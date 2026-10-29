@@ -23,6 +23,7 @@ public:
 
     // Size of the buffer (including channel info)
     uint32_t buffer_size;
+    uint32_t buffer_capacity;   // G&W: samples allocated in buffer
 
     SoundChip();
     ~SoundChip();
