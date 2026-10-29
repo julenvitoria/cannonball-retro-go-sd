@@ -2,7 +2,8 @@
 //
 // Same look as frontend/menu.cpp (OutRun logo, scrolling road, green text in the game's font,
 // minicar cursor) but without std::vector/std::string/boost, and with only the options that make
-// sense here: PLAY GAME, SETTINGS (gears, time, traffic) and EXIT. Labels follow the Retro-Go
+// sense here: PLAY GAME, GAME MODES (continuous mode, time trial), SETTINGS (gears, time, traffic,
+// steering) and EXIT. Labels follow the Retro-Go
 // language for the Latin-alphabet languages (the OutRun font only has A-Z, 0-9 and a few
 // symbols, so no accents); anything else falls back to English.
 #include <string.h>
@@ -24,6 +25,7 @@
 #include "engine/otiles.hpp"
 #include "engine/audio/osoundint.hpp"
 #include "frontend/config.hpp"
+#include "frontend/ttrial.hpp"
 #include "sdl2/input.hpp"
 
 // ------------------------------------------------------------------------------------------------
@@ -31,26 +33,34 @@
 // ------------------------------------------------------------------------------------------------
 enum {
     S_PLAY, S_SETTINGS, S_EXIT, S_GEARS, S_MANUAL, S_AUTO, S_TIME, S_TRAFFIC,
-    S_EASY, S_NORMAL, S_HARD, S_HARDEST, S_INFINITE, S_NONE, S_BACK, S_STEER, S_COUNT
+    S_EASY, S_NORMAL, S_HARD, S_HARDEST, S_INFINITE, S_NONE, S_BACK, S_STEER,
+    S_MODES, S_CONT, S_TTRIAL, S_START, S_LAPS, S_COUNT
 };
 
 struct lang_t { const char* code; const char* s[S_COUNT]; };
 
 static const lang_t LANGS[] = {
     { "en", { "PLAY GAME", "SETTINGS", "EXIT", "GEARS", "MANUAL", "AUTOMATIC", "TIME", "TRAFFIC",
-              "EASY", "NORMAL", "HARD", "HARDEST", "INFINITE", "NONE", "BACK", "STEERING" } },
+              "EASY", "NORMAL", "HARD", "HARDEST", "INFINITE", "NONE", "BACK", "STEERING",
+              "GAME MODES", "CONTINUOUS MODE", "TIME TRIAL", "START", "LAPS" } },
     { "es", { "JUGAR", "AJUSTES", "SALIR", "MARCHAS", "MANUAL", "AUTOMATICO", "TIEMPO", "TRAFICO",
-              "FACIL", "NORMAL", "DIFICIL", "MUY DIFICIL", "INFINITO", "SIN TRAFICO", "VOLVER", "DIRECCION" } },
+              "FACIL", "NORMAL", "DIFICIL", "MUY DIFICIL", "INFINITO", "SIN TRAFICO", "VOLVER", "DIRECCION",
+              "MODOS DE JUEGO", "MODO CONTINUO", "CONTRARRELOJ", "EMPEZAR", "VUELTAS" } },
     { "pt", { "JOGAR", "DEFINICOES", "SAIR", "MUDANCAS", "MANUAL", "AUTOMATICO", "TEMPO", "TRANSITO",
-              "FACIL", "NORMAL", "DIFICIL", "MUITO DIFICIL", "INFINITO", "SEM TRANSITO", "VOLTAR", "DIRECAO" } },
+              "FACIL", "NORMAL", "DIFICIL", "MUITO DIFICIL", "INFINITO", "SEM TRANSITO", "VOLTAR", "DIRECAO",
+              "MODOS DE JOGO", "MODO CONTINUO", "CONTRA RELOGIO", "COMECAR", "VOLTAS" } },
     { "fr", { "JOUER", "PARAMETRES", "QUITTER", "VITESSES", "MANUELLES", "AUTOMATIQUES", "TEMPS", "TRAFIC",
-              "FACILE", "NORMAL", "DIFFICILE", "TRES DIFFICILE", "INFINI", "AUCUN", "RETOUR", "DIRECTION" } },
+              "FACILE", "NORMAL", "DIFFICILE", "TRES DIFFICILE", "INFINI", "AUCUN", "RETOUR", "DIRECTION",
+              "MODES DE JEU", "MODE CONTINU", "CONTRE LA MONTRE", "COMMENCER", "TOURS" } },
     { "it", { "GIOCA", "IMPOSTAZIONI", "ESCI", "CAMBIO", "MANUALE", "AUTOMATICO", "TEMPO", "TRAFFICO",
-              "FACILE", "NORMALE", "DIFFICILE", "DIFFICILISSIMO", "INFINITO", "NESSUNO", "INDIETRO", "STERZO" } },
+              "FACILE", "NORMALE", "DIFFICILE", "DIFFICILISSIMO", "INFINITO", "NESSUNO", "INDIETRO", "STERZO",
+              "MODALITA", "MODALITA CONTINUA", "CONTRO IL TEMPO", "INIZIA", "GIRI" } },
     { "de", { "SPIELEN", "EINSTELLUNGEN", "BEENDEN", "SCHALTUNG", "MANUELL", "AUTOMATIK", "ZEIT", "VERKEHR",
-              "LEICHT", "NORMAL", "SCHWER", "SEHR SCHWER", "UNENDLICH", "KEINER", "ZURUECK", "LENKUNG" } },
+              "LEICHT", "NORMAL", "SCHWER", "SEHR SCHWER", "UNENDLICH", "KEINER", "ZURUECK", "LENKUNG",
+              "SPIELMODI", "ENDLOSMODUS", "ZEITFAHREN", "STARTEN", "RUNDEN" } },
     { "no", { "SPILL", "INNSTILLINGER", "AVSLUTT", "GIR", "MANUELL", "AUTOMATISK", "TID", "TRAFIKK",
-              "LETT", "NORMAL", "VANSKELIG", "SVAERT VANSKELIG", "UENDELIG", "INGEN", "TILBAKE", "STYRING" } },
+              "LETT", "NORMAL", "VANSKELIG", "SVAERT VANSKELIG", "UENDELIG", "INGEN", "TILBAKE", "STYRING",
+              "SPILLMODUS", "KONTINUERLIG", "TIDSKJORING", "START", "RUNDER" } },
 };
 
 static const lang_t* g_lang = &LANGS[0];
@@ -100,6 +110,26 @@ bool cb_engine_take_settings(int* auto_gears, int* time, int* traffic, int* stee
     return true;
 }
 
+// Continuous mode traffic (0-8) and time trial laps (1-5) / traffic (0-8), as Cannonball's menu
+static bool g_modes_dirty;
+
+void cb_engine_set_mode_settings(int cont_traffic, int laps, int tt_traffic)
+{
+    config.cont_traffic   = cont_traffic >= 0 && cont_traffic <= TTrial::MAX_TRAFFIC ? cont_traffic : 3;
+    config.ttrial.laps    = laps >= 1 && laps <= TTrial::MAX_LAPS ? laps : 5;
+    config.ttrial.traffic = tt_traffic >= 0 && tt_traffic <= TTrial::MAX_TRAFFIC ? tt_traffic : 3;
+}
+
+bool cb_engine_take_mode_settings(int* cont_traffic, int* laps, int* tt_traffic)
+{
+    if (!g_modes_dirty) return false;
+    g_modes_dirty = false;
+    *cont_traffic = config.cont_traffic;
+    *laps = config.ttrial.laps;
+    *tt_traffic = config.ttrial.traffic;
+    return true;
+}
+
 // ------------------------------------------------------------------------------------------------
 // Menu
 // ------------------------------------------------------------------------------------------------
@@ -107,22 +137,49 @@ static const int16_t  LOGO_Y       = -60;
 static const uint16_t ROWS         = 28;
 static const uint16_t HORIZON_DEST = 0x3A0;
 
-enum { PAGE_MAIN, PAGE_SETTINGS };
-enum { ITEM_PLAY, ITEM_SETTINGS, ITEM_EXIT, ITEM_GEARS, ITEM_TIME, ITEM_TRAFFIC, ITEM_STEER, ITEM_BACK };
-static const int MAIN_ITEMS[]     = { ITEM_PLAY, ITEM_SETTINGS, ITEM_EXIT };
+enum { PAGE_MAIN, PAGE_SETTINGS, PAGE_MODES, PAGE_CONT, PAGE_TTRIAL, PAGE_COUNT };
+enum { ITEM_PLAY, ITEM_SETTINGS, ITEM_EXIT, ITEM_GEARS, ITEM_TIME, ITEM_TRAFFIC, ITEM_STEER, ITEM_BACK,
+       ITEM_MODES, ITEM_CONT, ITEM_TTRIAL, ITEM_CONT_START, ITEM_CONT_TRAFFIC, ITEM_TT_START, ITEM_TT_LAPS,
+       ITEM_TT_TRAFFIC };
+static const int MAIN_ITEMS[]     = { ITEM_PLAY, ITEM_MODES, ITEM_SETTINGS, ITEM_EXIT };
 static const int SETTINGS_ITEMS[] = { ITEM_GEARS, ITEM_TIME, ITEM_TRAFFIC, ITEM_STEER, ITEM_BACK };
+static const int MODES_ITEMS[]    = { ITEM_CONT, ITEM_TTRIAL, ITEM_BACK };
+static const int CONT_ITEMS[]     = { ITEM_CONT_START, ITEM_CONT_TRAFFIC, ITEM_BACK };
+static const int TTRIAL_ITEMS[]   = { ITEM_TT_START, ITEM_TT_LAPS, ITEM_TT_TRAFFIC, ITEM_BACK };
+static const int PARENT[PAGE_COUNT] = { PAGE_MAIN, PAGE_MAIN, PAGE_MAIN, PAGE_MODES, PAGE_MODES };
 
-static int  g_page, g_cursor, g_main_cursor;
+static int  g_page, g_cursor, g_cursors[PAGE_COUNT];     // cursor kept per page for BACK
 static int  g_frame;
 static bool g_exit_requested;
+static bool g_ttrial;                                    // time trial track selection on screen
+static TTrial g_ttrial_fe(config.ttrial.best_times);
 
 bool cb_engine_exit_requested(void) { bool r = g_exit_requested; g_exit_requested = false; return r; }
 
+#define N(a) (int)(sizeof a / sizeof a[0])
 static const int* items(int* n)
 {
-    if (g_page == PAGE_MAIN) { *n = 3; return MAIN_ITEMS; }
-    *n = sizeof SETTINGS_ITEMS / sizeof SETTINGS_ITEMS[0];
-    return SETTINGS_ITEMS;
+    switch (g_page) {
+        case PAGE_SETTINGS: *n = N(SETTINGS_ITEMS); return SETTINGS_ITEMS;
+        case PAGE_MODES:    *n = N(MODES_ITEMS);    return MODES_ITEMS;
+        case PAGE_CONT:     *n = N(CONT_ITEMS);     return CONT_ITEMS;
+        case PAGE_TTRIAL:   *n = N(TTRIAL_ITEMS);   return TTRIAL_ITEMS;
+        default:            *n = N(MAIN_ITEMS);     return MAIN_ITEMS;
+    }
+}
+
+static void go_page(int page)
+{
+    g_cursors[g_page] = g_cursor;
+    g_page = page;
+    g_cursor = page == PARENT[page] ? g_cursors[page] : 0;
+}
+
+static void go_back(void)
+{
+    int parent = PARENT[g_page];
+    g_page = parent;
+    g_cursor = g_cursors[parent];
 }
 
 static const char* level_name(int level, bool traffic)
@@ -149,6 +206,20 @@ static void item_text(int item, char* out, size_t size)
             a = T(S_STEER); b = num; break;
         }
         case ITEM_BACK:     a = T(S_BACK); break;
+        case ITEM_MODES:    a = T(S_MODES); break;
+        case ITEM_CONT:     a = T(S_CONT); break;
+        case ITEM_TTRIAL:   a = T(S_TTRIAL); break;
+        case ITEM_CONT_START:
+        case ITEM_TT_START: a = T(S_START); break;
+        case ITEM_CONT_TRAFFIC:
+        case ITEM_TT_TRAFFIC:
+        case ITEM_TT_LAPS: {
+            static char num[2];
+            int v = item == ITEM_CONT_TRAFFIC ? config.cont_traffic : item == ITEM_TT_LAPS ? config.ttrial.laps
+                                                                                         : config.ttrial.traffic;
+            num[0] = (char)('0' + v); num[1] = 0;
+            a = T(item == ITEM_TT_LAPS ? S_LAPS : S_TRAFFIC); b = num; break;
+        }
     }
     size_t n = 0;
     for (const char* p = a; *p && n + 1 < size; p++) out[n++] = *p;
@@ -162,6 +233,13 @@ static void item_text(int item, char* out, size_t size)
 // Background: as Menu::init() (logo, sky, road scrolling towards the horizon)
 static void menu_init(void)
 {
+    // A new best lap in the last time trial: keep it (as Menu::init())
+    if (outrun.ttrial.new_high_score) {
+        outrun.ttrial.new_high_score = false;
+        g_ttrial_fe.update_best_time();
+    }
+    g_ttrial = false;
+
     outrun.select_course(false, config.engine.prototype != 0);
     video.enabled = true;
     video.sprite_layer->set_x_clip(false);
@@ -195,6 +273,7 @@ static void menu_init(void)
 
     g_page = PAGE_MAIN;
     g_cursor = 0;
+    for (int i = 0; i < PAGE_COUNT; i++) g_cursors[i] = 0;
     g_frame = 0;
 }
 
@@ -226,10 +305,42 @@ static void select_item(int item, int dir)
             osoundint.queue_clear();
             return;
         case ITEM_SETTINGS:
+            if (!dir) go_page(PAGE_SETTINGS);
+            return;
+        case ITEM_MODES:
+            if (!dir) go_page(PAGE_MODES);
+            return;
+        case ITEM_CONT:
+            if (!dir) go_page(PAGE_CONT);
+            return;
+        case ITEM_TTRIAL:
+            if (!dir) go_page(PAGE_TTRIAL);
+            return;
+        case ITEM_CONT_START:
             if (dir) return;
-            g_main_cursor = g_cursor;
-            g_page = PAGE_SETTINGS;
-            g_cursor = 0;
+            outrun.custom_traffic = config.cont_traffic;
+            outrun.cannonball_mode = Outrun::MODE_CONT;
+            config.engine.fix_bugs = config.engine.fix_bugs_backup;
+            cannonball::state = cannonball::STATE_INIT_GAME;
+            osoundint.queue_clear();
+            return;
+        case ITEM_TT_START:
+            if (dir) return;
+            config.engine.fix_bugs = config.engine.fix_bugs_backup;
+            g_ttrial = true;                     // track selection (frontend/ttrial.cpp)
+            g_ttrial_fe.init();
+            return;
+        case ITEM_CONT_TRAFFIC:
+            config.cont_traffic = (config.cont_traffic + (dir < 0 ? TTrial::MAX_TRAFFIC : 1)) % (TTrial::MAX_TRAFFIC + 1);
+            g_modes_dirty = true;
+            return;
+        case ITEM_TT_TRAFFIC:
+            config.ttrial.traffic = (config.ttrial.traffic + (dir < 0 ? TTrial::MAX_TRAFFIC : 1)) % (TTrial::MAX_TRAFFIC + 1);
+            g_modes_dirty = true;
+            return;
+        case ITEM_TT_LAPS:
+            config.ttrial.laps = (config.ttrial.laps + (dir < 0 ? TTrial::MAX_LAPS - 2 : 0)) % TTrial::MAX_LAPS + 1;
+            g_modes_dirty = true;
             return;
         case ITEM_EXIT:
             if (!dir) g_exit_requested = true;
@@ -250,9 +361,7 @@ static void select_item(int item, int dir)
                                    (config.controls.steer_speed + (dir < 0 ? 7 : 0)) % 9 + 1);
             break;
         case ITEM_BACK:
-            if (dir) return;
-            g_page = PAGE_MAIN;
-            g_cursor = g_main_cursor;
+            if (!dir) go_back();
             return;
     }
     g_settings_dirty = true;
@@ -274,15 +383,14 @@ static void menu_tick(void)
     } else if (input.has_pressed(Input::START) || input.has_pressed(Input::ACCEL)) {
         osoundint.queue_sound(sound::BEEP1);
         select_item(it[g_cursor], 0);
-    } else if (g_page == PAGE_SETTINGS && (input.has_pressed(Input::LEFT) || input.has_pressed(Input::RIGHT))) {
+    } else if (g_page != PAGE_MAIN && (input.has_pressed(Input::LEFT) || input.has_pressed(Input::RIGHT))) {
         osoundint.queue_sound(sound::BEEP1);
         select_item(it[g_cursor], input.has_pressed(Input::LEFT) ? -1 : 1);
-    } else if (g_page == PAGE_SETTINGS && input.has_pressed(Input::BRAKE)) {
+    } else if (g_page != PAGE_MAIN && input.has_pressed(Input::BRAKE)) {
         osoundint.queue_sound(sound::BEEP1);
-        g_page = PAGE_MAIN;
-        g_cursor = g_main_cursor;
+        go_back();
     }
-    if (cannonball::state != cannonball::STATE_MENU)
+    if (cannonball::state != cannonball::STATE_MENU || g_ttrial)
         return;
     draw_options();
 
@@ -326,7 +434,18 @@ void gw_menu_state_tick(void)
             cannonball::state = cannonball::STATE_MENU;
             break;
         case cannonball::STATE_MENU:
-            menu_tick();
+            if (g_ttrial) {
+                // Time trial track selection: steer to choose, GAME/A to start, B back to the menu
+                if (input.has_pressed(Input::BRAKE)) {
+                    menu_init();
+                    g_page = PAGE_TTRIAL;
+                } else if (g_ttrial_fe.tick() == TTrial::INIT_GAME) {
+                    g_ttrial = false;
+                    cannonball::state = cannonball::STATE_INIT_GAME;
+                    osoundint.queue_clear();
+                }
+            } else
+                menu_tick();
             input.frame_done();
             osoundint.tick();
             break;

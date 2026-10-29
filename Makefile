@@ -49,6 +49,7 @@ $(CB)/engine/oinputs.cpp \
 $(CB)/engine/olevelobjs.cpp \
 $(CB)/engine/ologo.cpp \
 $(CB)/engine/omap.cpp \
+$(CB)/frontend/ttrial.cpp \
 $(CB)/engine/omusic.cpp \
 $(CB)/engine/ooutputs.cpp \
 $(CB)/engine/opalette.cpp \

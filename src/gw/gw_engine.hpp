@@ -40,6 +40,8 @@ bool cb_engine_exit_requested(void);           // EXIT chosen in the menu (clear
 // time / traffic: 0 easy, 1 normal, 2 hard, 3 hardest, 4 infinite time / no traffic
 void cb_engine_set_settings(int auto_gears, int time, int traffic, int steer);
 bool cb_engine_take_settings(int* auto_gears, int* time, int* traffic, int* steer);  // true if changed
+void cb_engine_set_mode_settings(int cont_traffic, int laps, int tt_traffic);
+bool cb_engine_take_mode_settings(int* cont_traffic, int* laps, int* tt_traffic);  // true if changed
 
 #ifdef __cplusplus
 }
