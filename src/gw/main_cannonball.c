@@ -310,5 +310,16 @@ void app_main(uint8_t load_state, uint8_t start_paused, int8_t save_slot)
 
         submit_audio();
         common_emu_sound_sync(false);
+#ifdef CB_MEMLOG    /* emulator tests: free memory every 2 s into /cannonball/mem.log */
+        static uint32_t memlog_n;
+        if (++memlog_n % 60 == 0) {
+            FILE *mf = fopen(CB_DIR "/mem.log", memlog_n == 60 ? "w" : "a");
+            if (mf) {
+                fprintf(mf, "%lu ram %u dtc %u ahb %u\n", (unsigned long)memlog_n, (unsigned)ram_get_free_size(),
+                        (unsigned)dtc_get_free_size(), (unsigned)ahb_get_free_size());
+                fclose(mf);
+            }
+        }
+#endif
     }
 }
