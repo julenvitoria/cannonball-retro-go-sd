@@ -106,7 +106,7 @@ El juego empieza en el menú de Cannonball (el logo de OutRun sobre la carretera
   - **TIEMPO**: fácil, normal, difícil, muy difícil o infinito.
   - **TRÁFICO**: fácil, normal, difícil, muy difícil o sin tráfico.
   - **DIRECCIÓN**: de 1 a 9, lo rápido que gira el coche mientras mantienes izquierda/derecha (la
-    cruceta es digital y el volante gira poco a poco; 5 por defecto, el de Cannonball es 3; más alto responde antes).
+    cruceta es digital y el volante gira poco a poco; 8 por defecto, el de Cannonball es 3; más alto responde antes).
 - **SALIR**: vuelve a Retro-Go.
 
 En el menú: arriba/abajo para moverse, A o GAME para elegir. Para volver al menú desde el juego:
