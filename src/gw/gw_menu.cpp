@@ -86,9 +86,9 @@ static int  traffic_level(void) { return config.engine.disable_traffic ? 4 : con
 void cb_engine_set_settings(int auto_gears, int time, int traffic, int steer)
 {
     // Digital steering: how far the wheel turns per game tick (30 Hz) while left/right is held,
-    // out of 0x38 to full lock. Cannonball's default is 3 (about 0.6 s to full lock); 5 here
-    // (about 0.4 s), which suits the G&W D-pad better.
-    if (steer < 1 || steer > 9) steer = 5;
+    // out of 0x38 to full lock. Cannonball's default is 3 (about 0.6 s to full lock); 8 here
+    // (about 0.25 s), which suits the G&W D-pad better.
+    if (steer < 1 || steer > 9) steer = 8;
     config.controls.steer_speed = steer;
     cb_engine_set_auto_gears(auto_gears != 0);
     if (time < 0 || time > 4) time = 0;
