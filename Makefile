@@ -107,12 +107,17 @@ sz=Path('$(COVER_JPG)').stat().st_size; \
 assert sz <= 10*1024, f'cover too big: {sz}'"
 
 PACK_HOMEBREW := $(GNW_CORE_SDK)/tools/pack_homebrew.py
+# CannonBall has no Retro-Go save states (no load/save handlers): GWHB_FLAG_NO_SAVESTATES
+# (1 << 0, gwhb.h) tells the launcher to hide Resume / Save / Reload for it. Older firmware
+# ignores unknown flag bits.
+GWHB_FLAGS := 0x1
 pack: $(TARGET_BIN) $(if $(wildcard $(COVER_SRC)),$(COVER_JPG))
 	$(V)$(ECHO) [ PACK GWHB ] "$(PACKED_BIN)" version=$(CORE_VERSION)
 	$(V)python3 $(PACK_HOMEBREW) \
 		--nm $(if $(GCC_PATH),$(GCC_PATH)/)arm-none-eabi-nm \
 		--elf $(TARGET_ELF) --bin $(TARGET_BIN) \
 		--name "$(HB_NAME)" --version "$(CORE_VERSION)" \
+		--flags $(GWHB_FLAGS) \
 		$(if $(wildcard $(COVER_SRC)),--cover $(COVER_JPG)) \
 		--out "$(BUILD_DIR)/$(PACKED_BIN)"
 
