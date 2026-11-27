@@ -92,7 +92,7 @@ CXXFLAGS += $(CB_CXX_INC) $(CB_WARN_OFF) -std=gnu++14
 
 CORE_LDLIBS := -lm
 
-CORE_VERSION ?= 0.1.0
+CORE_VERSION ?= 1.0.2
 
 .PHONY: pack cover
 cover: $(COVER_JPG)
